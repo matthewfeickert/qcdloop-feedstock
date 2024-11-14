@@ -12,11 +12,13 @@ source:
   patches:
     # Avoid egrep warning breaking qcdloop-config
     - 0001-fix-Use-grep-E-over-egrep.patch
+    # Allow setting CMAKE_CXX_FLAGS from CXXFLAGS
+    - 0002-environment-override-of-CMAKE_CXX_FLAGS.patch
 
 build:
   # FIXME: clang does not yet support quadmath, so macOS builds are broken
   skip: true  # [not linux]
-  number: 0
+  number: 1
   run_exports:
     - {{ pin_subpackage('qcdloop', max_pin='x.x') }}
   script:
