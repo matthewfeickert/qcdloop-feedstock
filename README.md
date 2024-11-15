@@ -11,6 +11,8 @@ Summary: QCDLoop: an object-oriented one-loop scalar Feynman integrals framework
 
 Development: https://github.com/scarrazza/qcdloop
 
+Documentation: https://qcdloop.web.cern.ch/
+
 Current build status
 ====================
 

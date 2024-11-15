@@ -14,11 +14,13 @@ source:
     - 0001-fix-Use-grep-E-over-egrep.patch
     # Allow setting CMAKE_CXX_FLAGS from CXXFLAGS
     - 0002-environment-override-of-CMAKE_CXX_FLAGS.patch
+    # Give cmake_minimum_required a range of supported CMakes
+    - 0003-support-range-of-cmakes.patch
 
 build:
   # FIXME: clang does not yet support quadmath, so macOS builds are broken
   skip: true  # [not linux]
-  number: 1
+  number: 2
   run_exports:
     - {{ pin_subpackage('qcdloop', max_pin='x.x') }}
   script:
@@ -84,6 +86,7 @@ about:
   license: GPL-3.0-only
   license_family: GPL
   license_file: source/LICENSE
+  doc_url: https://qcdloop.web.cern.ch/
   dev_url: https://github.com/scarrazza/qcdloop
 
 extra:

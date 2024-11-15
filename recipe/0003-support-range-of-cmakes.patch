@@ -1,0 +1,24 @@
+From b3e25a1b12471e1760dbfa8ae1fff73f8d5d8d44 Mon Sep 17 00:00:00 2001
+From: Matthew Feickert <matthew.feickert@cern.ch>
+Date: Fri, 15 Nov 2024 00:16:01 -0700
+Subject: [PATCH] MNT: Provide range of CMakes to cmake_minimum_required
+
+* Set lower bound of 3.12, when the range feature was introduced, and
+  upper bound of 3.31, the current latest release.
+---
+ CMakeLists.txt | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/CMakeLists.txt b/CMakeLists.txt
+index 412b98c..fa7780b 100644
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -1,4 +1,4 @@
+-cmake_minimum_required (VERSION 3.0.2)
++cmake_minimum_required(VERSION 3.12...3.31)
+ 
+ # Disable the use of RPATHS - we probably are not
+ # that interested in relocatable binaries and it
+-- 
+2.47.0
+
