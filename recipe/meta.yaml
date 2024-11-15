@@ -20,7 +20,7 @@ source:
 build:
   # FIXME: clang does not yet support quadmath, so macOS builds are broken
   skip: true  # [not linux]
-  number: 2
+  number: 3
   run_exports:
     - {{ pin_subpackage('qcdloop', max_pin='x.x') }}
   script:
@@ -92,3 +92,4 @@ about:
 extra:
   recipe-maintainers:
     - matthewfeickert
+    - scarrazza

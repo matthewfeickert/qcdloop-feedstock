@@ -174,4 +174,5 @@ Feedstock Maintainers
 =====================
 
 * [@matthewfeickert](https://github.com/matthewfeickert/)
+* [@scarrazza](https://github.com/scarrazza/)
 
