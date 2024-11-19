@@ -28,10 +28,10 @@ build:
     # Note that conda-forge sed is gsed even on macOS
     - sed -i 's/ -fext-numeric-literals//g' source/CMakeLists.txt  # [osx]
     - echo "Looking for quadmath.h"
+    - echo "Looking under $BUILD_PREFIX"
+    - find $BUILD_PREFIX -type f -iname "*quadmath*"
     - echo "Looking under $PREFIX"
     - find $PREFIX -type f -iname "*quadmath*"
-    - echo "Looking under /home"
-    - find /home -type f -iname "*quadmath*"
     - cmake -DCMAKE_INSTALL_PREFIX=$PREFIX -DENABLE_EXAMPLES=ON -S source -B build
     - cmake -LH build
     - cmake --build build --clean-first --parallel="${CPU_COUNT}"
