@@ -26,7 +26,7 @@ build:
   script:
     # FIXME: Remove unknown argument: '-fext-numeric-literals' CMAKE_CXX_FLAGS for macOS builds
     # Note that conda-forge sed is gsed even on macOS
-    # - sed -i 's/ -fext-numeric-literals//g' source/CMakeLists.txt  # [osx]
+    - sed -i 's/ -fext-numeric-literals//g' source/CMakeLists.txt  # [osx]
     - find $PREFIX -type f -iname "*quadmath*"
     - cmake -DCMAKE_INSTALL_PREFIX=$PREFIX -DENABLE_EXAMPLES=ON -S source -B build
     - cmake -LH build
@@ -40,7 +40,7 @@ requirements:
     - {{ compiler('fortran') }}
     - cmake
     - make
-    # - sed  # [osx]
+    - sed  # [osx]
   run:
     - grep  # for qcdloop-config
 
