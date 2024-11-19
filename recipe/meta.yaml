@@ -19,14 +19,14 @@ source:
 
 build:
   # FIXME: clang does not yet support quadmath, so macOS builds are broken
-  skip: true  # [not linux]
-  number: 4
+  skip: true  # [win]
+  number: 5
   run_exports:
     - {{ pin_subpackage('qcdloop', max_pin='x.x') }}
   script:
     # FIXME: Remove unknown argument: '-fext-numeric-literals' CMAKE_CXX_FLAGS for macOS builds
     # Note that conda-forge sed is gsed even on macOS
-    - sed -i 's/ -fext-numeric-literals//g' source/CMakeLists.txt  # [osx]
+    # - sed -i 's/ -fext-numeric-literals//g' source/CMakeLists.txt  # [osx]
     - cmake -DCMAKE_INSTALL_PREFIX=$PREFIX -DENABLE_EXAMPLES=ON -S source -B build
     - cmake -LH build
     - cmake --build build --clean-first --parallel="${CPU_COUNT}"
@@ -39,7 +39,7 @@ requirements:
     - {{ compiler('fortran') }}
     - cmake
     - make
-    - sed  # [osx]
+    # - sed  # [osx]
   run:
     - grep  # for qcdloop-config
 
