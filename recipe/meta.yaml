@@ -20,7 +20,7 @@ source:
 build:
   # FIXME: clang does not yet support quadmath, so macOS builds are broken
   skip: true  # [not linux]
-  number: 3
+  number: 4
   run_exports:
     - {{ pin_subpackage('qcdloop', max_pin='x.x') }}
   script:
@@ -44,29 +44,28 @@ requirements:
     - grep  # for qcdloop-config
 
 test:
-  files:
-    - $PREFIX/bin/qcdloop-config
-    - $PREFIX/lib/pkgconfig/qcdloop.pc
-    - $PREFIX/include/qcdloop/bubble.h
-    - $PREFIX/include/qcdloop/maths.h
-    - $PREFIX/include/qcdloop/types.h
-    - $PREFIX/include/qcdloop/config.h.in
-    - $PREFIX/include/qcdloop/timer.h
-    - $PREFIX/include/qcdloop/qcdloop.h
-    - $PREFIX/include/qcdloop/wrapper.h
-    - $PREFIX/include/qcdloop/cache.h
-    - $PREFIX/include/qcdloop/topology.h
-    - $PREFIX/include/qcdloop/triangle.h
-    - $PREFIX/include/qcdloop/tools.h
-    - $PREFIX/include/qcdloop/exceptions.h
-    - $PREFIX/include/qcdloop/tadpole.h
-    - $PREFIX/include/qcdloop/box.h
-    - $PREFIX/include/qcdloop/config.h
-    - $PREFIX/lib/libqcdloop.so  # [linux]
-    - $PREFIX/lib/libqcdloop.dylib  # [osx]
   source_files:
     - build
   commands:
+    - test -f $PREFIX/bin/qcdloop-config
+    - test -f $PREFIX/lib/pkgconfig/qcdloop.pc
+    - test -f $PREFIX/include/qcdloop/bubble.h
+    - test -f $PREFIX/include/qcdloop/maths.h
+    - test -f $PREFIX/include/qcdloop/types.h
+    - test -f $PREFIX/include/qcdloop/config.h.in
+    - test -f $PREFIX/include/qcdloop/timer.h
+    - test -f $PREFIX/include/qcdloop/qcdloop.h
+    - test -f $PREFIX/include/qcdloop/wrapper.h
+    - test -f $PREFIX/include/qcdloop/cache.h
+    - test -f $PREFIX/include/qcdloop/topology.h
+    - test -f $PREFIX/include/qcdloop/triangle.h
+    - test -f $PREFIX/include/qcdloop/tools.h
+    - test -f $PREFIX/include/qcdloop/exceptions.h
+    - test -f $PREFIX/include/qcdloop/tadpole.h
+    - test -f $PREFIX/include/qcdloop/box.h
+    - test -f $PREFIX/include/qcdloop/config.h
+    - test -f $PREFIX/lib/libqcdloop${SHLIB_EXT}
+
     - qcdloop-config --help
     - qcdloop-config --prefix
     - qcdloop-config --incdir
