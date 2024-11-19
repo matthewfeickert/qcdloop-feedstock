@@ -24,7 +24,8 @@ build:
   run_exports:
     - {{ pin_subpackage('qcdloop', max_pin='x.x') }}
   script:
-    - curl -L https://raw.githubusercontent.com/gcc-mirror/gcc/f5a87c8d8c6a8cfcd23595e67d3b86939e01c75c/libquadmath/quadmath.h -o $BUILD_PREFIX/include/quadmath.h  # [osx]
+    # - curl -L https://raw.githubusercontent.com/gcc-mirror/gcc/f5a87c8d8c6a8cfcd23595e67d3b86939e01c75c/libquadmath/quadmath.h -o $BUILD_PREFIX/include/quadmath.h  # [osx]
+    - cp $(find $BUILD_PREFIX -type f -iname "quadmath.h") $PREFIX/include/  # [osx]
     # FIXME: Remove unknown argument: '-fext-numeric-literals' CMAKE_CXX_FLAGS for macOS builds
     # Note that conda-forge sed is gsed even on macOS
     - sed -i 's/ -fext-numeric-literals//g' source/CMakeLists.txt  # [osx]
@@ -46,7 +47,7 @@ requirements:
     - cmake
     - make
     - sed  # [osx]
-    - curl # [osx]
+    # - curl # [osx]
   run:
     - grep  # for qcdloop-config
 
