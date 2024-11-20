@@ -19,21 +19,12 @@ source:
 
 build:
   # FIXME: clang does not yet support quadmath, so macOS builds are broken
-  skip: true  # [win]
+  skip: true  # [not linux]
   number: 5
   run_exports:
     - {{ pin_subpackage('qcdloop', max_pin='x.x') }}
   script:
-    # - curl -L https://raw.githubusercontent.com/gcc-mirror/gcc/f5a87c8d8c6a8cfcd23595e67d3b86939e01c75c/libquadmath/quadmath.h -o $BUILD_PREFIX/include/quadmath.h  # [osx]
-    - cp $(find $BUILD_PREFIX -type f -iname "quadmath.h") $PREFIX/include/  # [osx]
-    # FIXME: Remove unknown argument: '-fext-numeric-literals' CMAKE_CXX_FLAGS for macOS builds
-    # Note that conda-forge sed is gsed even on macOS
-    - sed -i 's/ -fext-numeric-literals//g' source/CMakeLists.txt  # [osx]
-    - echo "Looking for quadmath.h"
-    - echo "Looking under $BUILD_PREFIX"
-    - find $BUILD_PREFIX -type f -iname "*quadmath*"
-    - echo "Looking under $PREFIX"
-    - find $PREFIX -type f -iname "*quadmath*"
+    - cp $(find $BUILD_PREFIX -type f -iname "quadmath.h") $PREFIX/include/  # [linux and aarch64]
     - cmake -DCMAKE_INSTALL_PREFIX=$PREFIX -DENABLE_EXAMPLES=ON -S source -B build
     - cmake -LH build
     - cmake --build build --clean-first --parallel="${CPU_COUNT}"
@@ -46,8 +37,6 @@ requirements:
     - {{ compiler('fortran') }}
     - cmake
     - make
-    - sed  # [osx]
-    # - curl # [osx]
   run:
     - grep  # for qcdloop-config
 
