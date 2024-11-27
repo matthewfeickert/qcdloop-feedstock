@@ -1,5 +1,5 @@
 {% set name = "qcdloop" %}
-{% set version = "2.0.9" %}
+{% set version = "2.0.11" %}
 
 package:
   name: {{ name }}
@@ -7,20 +7,13 @@ package:
 
 source:
   url: https://github.com/scarrazza/{{ name }}/archive/{{ version }}.tar.gz
-  sha256: 6ffbd371658726054b903dce9a7855ac02b258eac59e2ee13524dda9e278f23b
+  sha256: a6274a4f552209c5e8c41d265af52214ac72a235a25d3b771f969deb2f15788a
   folder: source
-  patches:
-    # Avoid egrep warning breaking qcdloop-config
-    - 0001-fix-Use-grep-E-over-egrep.patch
-    # Allow setting CMAKE_CXX_FLAGS from CXXFLAGS
-    - 0002-environment-override-of-CMAKE_CXX_FLAGS.patch
-    # Give cmake_minimum_required a range of supported CMakes
-    - 0003-support-range-of-cmakes.patch
 
 build:
   # FIXME: clang does not yet support quadmath, so macOS builds are broken
   skip: true  # [not linux]
-  number: 4
+  number: 0
   run_exports:
     - {{ pin_subpackage('qcdloop', max_pin='x.x') }}
   script:
@@ -45,7 +38,12 @@ requirements:
 
 test:
   source_files:
-    - build
+    - source/
+  requires:
+    - {{ compiler('cxx') }}
+    - {{ compiler('fortran') }}
+    - cmake
+    - make
   commands:
     - test -f $PREFIX/bin/qcdloop-config
     - test -f $PREFIX/lib/pkgconfig/qcdloop.pc
@@ -74,6 +72,8 @@ test:
     - qcdloop-config --ldflags
     - qcdloop-config --version
 
+    - cmake -DCMAKE_INSTALL_PREFIX=$PREFIX -DENABLE_EXAMPLES=ON -S source -B build
+    - cmake --build build --clean-first --parallel="${CPU_COUNT}"
     - cd build
     - ./cache_test  # [build_platform == target_platform]
     - ./cmass_test  # [build_platform == target_platform]
