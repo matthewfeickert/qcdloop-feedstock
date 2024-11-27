@@ -24,6 +24,7 @@ build:
   run_exports:
     - {{ pin_subpackage('qcdloop', max_pin='x.x') }}
   script:
+    - mkdir -p $PREFIX/include  # [linux and aarch64]
     - cp $(find $BUILD_PREFIX -type f -iname "quadmath.h") $PREFIX/include/  # [linux and aarch64]
     - cmake -DCMAKE_INSTALL_PREFIX=$PREFIX -DENABLE_EXAMPLES=ON -S source -B build
     - cmake -LH build
