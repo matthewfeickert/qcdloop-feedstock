@@ -1,0 +1,163 @@
+From 6e3aac07eb9eb1039e6239284f503a88597219b9 Mon Sep 17 00:00:00 2001
+From: Matthew Feickert <matthew.feickert@cern.ch>
+Date: Fri, 20 Dec 2024 23:37:54 -0700
+Subject: [PATCH] fix: Add back support for ppc64le
+
+* ppc64 little-endian is a supported architecture both on conda-forge and used in
+  HPC systems. Add back support for it by only disabling libquadmath on aarch64
+  builds and by checking for the ppc64 in header files.
+---
+ CMakeLists.txt      |  4 +++-
+ src/cache.cc        |  2 +-
+ src/qcdloop/maths.h | 14 +++++++-------
+ src/qcdloop/types.h |  4 ++--
+ src/tools.cc        |  2 +-
+ src/types.cc        |  2 +-
+ 6 files changed, 15 insertions(+), 13 deletions(-)
+
+diff --git a/CMakeLists.txt b/CMakeLists.txt
+index 849d137..5894c76 100644
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -66,7 +66,9 @@ configure_file(
+   "${PROJECT_SOURCE_DIR}/src/qcdloop.pc.in"
+   "${PROJECT_SOURCE_DIR}/src/qcdloop.pc"
+   )
+-IF(${CMAKE_SYSTEM_PROCESSOR} MATCHES "x86_64")
++# Only enable quadmath for non-aarch64 as aarch64 supports float128 and so
++# doesn't have libquadmath
++IF(NOT ${CMAKE_SYSTEM_PROCESSOR} MATCHES "aarch64")
+ set(QUADMATH_NAMES ${QUADMATH_NAMES} libquadmath.so quadmath)
+ find_library(QUADMATH_LIBRARY
+   NAMES ${QUADMATH_NAMES}
+diff --git a/src/cache.cc b/src/cache.cc
+index 57a80d6..3041681 100644
+--- a/src/cache.cc
++++ b/src/cache.cc
+@@ -17,7 +17,7 @@ namespace std {
+     seed ^= hasher(v) + 0x9e3779b9 + (seed << 6) + (seed >> 2);
+   }
+ 
+-#if defined(__x86_64__) || defined(__i386__)
++#if defined(__x86_64__) || defined(__i386__) || defined(__PPC64__) || defined(__ppc64__) || defined(_ARCH_PPC64)
+   template <>
+   struct hash<ql::qdouble> : public __hash_base<size_t, ql::qdouble>
+   {
+diff --git a/src/qcdloop/maths.h b/src/qcdloop/maths.h
+index b52ccf6..5f9a56d 100644
+--- a/src/qcdloop/maths.h
++++ b/src/qcdloop/maths.h
+@@ -21,7 +21,7 @@ namespace ql
+ {
+   // Logarithms
+   inline double   Log(double const& x)   { return std::log(x); }
+-#if defined(__x86_64__) || defined(__i386__)
++#if defined(__x86_64__) || defined(__i386__) || defined(__PPC64__) || defined(__ppc64__) || defined(_ARCH_PPC64)
+   inline qdouble  Log(qdouble const& x)  { return logq(x); }
+   inline qcomplex Log(qcomplex const& x) { return clogq(x); }
+ #endif
+@@ -33,7 +33,7 @@ namespace ql
+ 
+   // Power
+   inline double   Pow(double const& x, int const& a)   { return std::pow(x, a); }
+-#if defined(__x86_64__) || defined(__i386__)
++#if defined(__x86_64__) || defined(__i386__) || defined(__PPC64__) || defined(__ppc64__) || defined(_ARCH_PPC64)
+   inline qdouble  Pow(qdouble const& x, int const& a)  { return powq(x,a); }
+   inline qcomplex Pow(qcomplex const& x, int const& a){ return cpowq(x,a); }
+ #endif
+@@ -45,7 +45,7 @@ namespace ql
+ 
+   // Root
+   inline double   Sqrt(double const& x)  { return std::sqrt(x); }
+-#if defined(__x86_64__) || defined(__i386__)
++#if defined(__x86_64__) || defined(__i386__) || defined(__PPC64__) || defined(__ppc64__) || defined(_ARCH_PPC64)
+   inline qdouble  Sqrt(qdouble const& x) { return sqrtq(x); }
+   inline qcomplex Sqrt(qcomplex const& x){ return csqrtq(x); }
+ #endif
+@@ -57,7 +57,7 @@ namespace ql
+ 
+   // Absolute value
+   inline double  Abs(double const& x)   { return std::abs(x); }
+-#if defined(__x86_64__) || defined(__i386__)
++#if defined(__x86_64__) || defined(__i386__) || defined(__PPC64__) || defined(__ppc64__) || defined(_ARCH_PPC64)
+   inline qdouble Abs(qdouble const& x)  { return fabsq(x);}
+   inline qdouble Abs(qcomplex const& x) { return cabsq(x); }
+ #endif
+@@ -71,7 +71,7 @@ namespace ql
+   inline double  Imag(double const& x)  { UNUSED(x); return 0; }
+   inline qdouble Imag(qdouble const& x) { UNUSED(x); return qdouble(0); }
+   inline double  Imag(complex const& x) { return x.imag(); }
+-#if defined(__x86_64__) || defined(__i386__)
++#if defined(__x86_64__) || defined(__i386__) || defined(__PPC64__) || defined(__ppc64__) || defined(_ARCH_PPC64)
+   inline qdouble Imag(qcomplex const& x){ return cimagq(x);}
+ #endif
+ #if defined(__aarch64__)
+@@ -81,7 +81,7 @@ namespace ql
+   inline double  Real(double const& x) { return x; }
+   inline qdouble Real(qdouble const& x) { return x; }
+   inline double  Real(complex const& x) { return x.real(); }
+-#if defined(__x86_64__) || defined(__i386__)
++#if defined(__x86_64__) || defined(__i386__) || defined(__PPC64__) || defined(__ppc64__) || defined(_ARCH_PPC64)
+   inline qdouble Real(qcomplex const& x) { return crealq(x); }
+ #endif
+ #if defined(__aarch64__)
+@@ -89,7 +89,7 @@ namespace ql
+ #endif
+ 
+   inline complex  Conjg(complex const& x) { return std::conj(x); }
+-#if defined(__x86_64__) || defined(__i386__)
++#if defined(__x86_64__) || defined(__i386__) || defined(__PPC64__) || defined(__ppc64__) || defined(_ARCH_PPC64)
+   inline qcomplex Conjg(qcomplex const& x){ return conjq(x); }
+ #endif
+ #if defined(__aarch64__)
+diff --git a/src/qcdloop/types.h b/src/qcdloop/types.h
+index 0294bcd..63be78a 100644
+--- a/src/qcdloop/types.h
++++ b/src/qcdloop/types.h
+@@ -7,7 +7,7 @@
+ 
+ #pragma once
+ 
+-#if defined(__x86_64__) || defined(__i386__)
++#if defined(__x86_64__) || defined(__i386__) || defined(__PPC64__) || defined(__ppc64__) || defined(_ARCH_PPC64)
+ extern "C" { // for gcc4.7 compatibility
+ #include <quadmath.h>
+ }
+@@ -49,7 +49,7 @@ namespace ql
+ namespace std
+ {
+ 
+-#if defined(__x86_64__) || defined(__i386__)
++#if defined(__x86_64__) || defined(__i386__) || defined(__PPC64__) || defined(__ppc64__) || defined(_ARCH_PPC64)
+   //! implementation of operator<< for qdouble
+   ostream& operator<<(std::ostream& out, ql::qdouble f);
+ #endif
+diff --git a/src/tools.cc b/src/tools.cc
+index bb24b76..7587d8d 100644
+--- a/src/tools.cc
++++ b/src/tools.cc
+@@ -20,7 +20,7 @@ namespace ql {
+   template<typename TOutput, typename TMass, typename TScale>
+   Tools<TOutput,TMass,TScale>::Tools():
+     _qlonshellcutoff(is_same<TScale,double>::value ? 1e-10 : 1e-20q),
+-#if defined(__x86_64__) || defined(__i386__)
++#if defined(__x86_64__) || defined(__i386__) || defined(__PPC64__) || defined(__ppc64__) || defined(_ARCH_PPC64)
+     _pi(is_same<TScale,double>::value ? M_PI : M_PIq),
+ #endif
+ #if defined(__aarch64__)
+diff --git a/src/types.cc b/src/types.cc
+index 19ac110..6bfb298 100644
+--- a/src/types.cc
++++ b/src/types.cc
+@@ -9,7 +9,7 @@
+ 
+ namespace std
+ {
+-#if defined(__x86_64__) || defined(__i386__)
++#if defined(__x86_64__) || defined(__i386__) || defined(__PPC64__) || defined(__ppc64__) || defined(_ARCH_PPC64)
+   ostream& operator<<(std::ostream& out, ql::qdouble f)
+   {
+      char buf[200];
+-- 
+2.47.1
+

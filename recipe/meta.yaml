@@ -1,5 +1,5 @@
 {% set name = "qcdloop" %}
-{% set version = "2.0.11" %}
+{% set version = "2.1.0" %}
 
 package:
   name: {{ name }}
@@ -7,8 +7,12 @@ package:
 
 source:
   url: https://github.com/scarrazza/{{ name }}/archive/{{ version }}.tar.gz
-  sha256: a6274a4f552209c5e8c41d265af52214ac72a235a25d3b771f969deb2f15788a
+  sha256: 75ac2d00231714210859d39c4beebce14f183707afe47f4550f33ef9f348b3c1
   folder: source
+  patches:
+    # Remove in releases after v2.1.0
+    # c.f. https://github.com/scarrazza/qcdloop/pull/35
+    - add-back-support-for-ppc64le.patch
 
 build:
   # FIXME: clang does not yet support quadmath, so macOS builds are broken
