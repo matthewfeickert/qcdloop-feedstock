@@ -24,7 +24,7 @@ build:
     # FIXME: Remove unknown argument: '-fext-numeric-literals' CMAKE_CXX_FLAGS for macOS builds
     # Note that conda-forge sed is gsed even on macOS
     - sed -i 's/ -fext-numeric-literals//g' source/CMakeLists.txt  # [osx]
-    - cmake -DCMAKE_INSTALL_PREFIX=$PREFIX -DENABLE_EXAMPLES=ON -S source -B build
+    - cmake "${CMAKE_ARGS}" -DCMAKE_INSTALL_PREFIX=$PREFIX -DENABLE_EXAMPLES=ON -S source -B build
     - cmake -LH build
     - cmake --build build --clean-first --parallel="${CPU_COUNT}"
     - cmake --install build
