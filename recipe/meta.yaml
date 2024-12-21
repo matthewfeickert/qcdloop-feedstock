@@ -13,6 +13,7 @@ source:
     # Remove in releases after v2.1.0
     # c.f. https://github.com/scarrazza/qcdloop/pull/35
     - add-back-support-for-ppc64le.patch
+    - no-parameter-expansion-on-CMAKE_SYSTEM_PROCESSOR.patch
 
 build:
   # FIXME: clang does not yet support quadmath, so macOS builds are broken
