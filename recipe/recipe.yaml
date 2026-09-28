@@ -20,18 +20,15 @@ source:
     - determine-quadmath-use-from-compiler-target.patch
 
 build:
-  # FIXME: clang does not yet support quadmath, so macOS builds are broken
   number: 1
+  # macOS clang does not support quadmath or __float128 on arm64, and long
+  # double is only 64-bit there, so quad precision is not available on macOS
   skip:
     - win
-    - osx and x86_64
+    - osx
   dynamic_linking:
     overlinking_behavior: error
   script:
-    # FIXME: Remove unknown argument: '-fext-numeric-literals' CMAKE_CXX_FLAGS for macOS builds
-    # Note that conda-forge sed is gsed even on macOS
-    - if: osx
-      then: sed -i 's/ -fext-numeric-literals//g' source/CMakeLists.txt
     - cmake ${CMAKE_ARGS} -DCMAKE_INSTALL_PREFIX=$PREFIX -DENABLE_EXAMPLES=ON -S source -B build
     - cmake -LH build
     - cmake --build build --clean-first --parallel="${CPU_COUNT}"
@@ -44,8 +41,6 @@ requirements:
     - ${{ compiler('fortran') }}
     - cmake
     - make
-    - if: osx
-      then: sed
   run:
     - grep  # for qcdloop-config
   run_exports:
