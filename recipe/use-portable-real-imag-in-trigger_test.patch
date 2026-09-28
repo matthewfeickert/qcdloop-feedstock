@@ -1,0 +1,30 @@
+From 553ca09f862ff3958fe562ad3bd127a58a49aee8 Mon Sep 17 00:00:00 2001
+From: Matthew Feickert <matthew.feickert@cern.ch>
+Date: Mon, 28 Sep 2026 09:53:35 -0600
+Subject: [PATCH] fix: Use architecture portable ql::Real and ql::Imag in
+ trigger_test
+
+* crealq and cimagq are only available from libquadmath, which is not
+  used on aarch64 builds. Use ql::Real and ql::Imag from qcdloop/maths.h
+  which dispatch to crealq/cimagq or creall/cimagl depending on the
+  architecture.
+---
+ examples/trigger_test.cc | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/examples/trigger_test.cc b/examples/trigger_test.cc
+index efdd908..c13c1cc 100644
+--- a/examples/trigger_test.cc
++++ b/examples/trigger_test.cc
+@@ -133,7 +133,7 @@ int main()
+   tt.printTime(tt.stop());
+ 
+   for (size_t i = 0; i < resq.size(); i++)
+-    cout << "eps" << i << "\t(" << crealq(resq[i]) << "," << cimagq(resq[i]) << endl;
++    cout << "eps" << i << "\t(" << ql::Real(resq[i]) << "," << ql::Imag(resq[i]) << endl;
+ 
+   ql::QCDLoop<qcomplex,qdouble,qdouble> qlq;
+   cout << ql::blue << "\n====== Auto-Trigger Tadpole ======" << ql::def << endl;
+-- 
+2.55.0
+
