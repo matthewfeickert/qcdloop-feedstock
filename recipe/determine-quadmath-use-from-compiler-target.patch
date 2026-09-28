@@ -1,0 +1,41 @@
+From 5dd6aec1abec6da95b995c4472468ee90bac436d Mon Sep 17 00:00:00 2001
+From: Matthew Feickert <matthew.feickert@cern.ch>
+Date: Mon, 28 Sep 2026 11:51:59 -0600
+Subject: [PATCH] fix: Determine quadmath use from compiler target macros
+
+* CMAKE_SYSTEM_PROCESSOR is determined from the host uname, so when
+  building under emulation (e.g. qemu-user on an x86_64 host) it reports
+  the host architecture and libquadmath is searched for on aarch64.
+* Instead, check the same architecture macros that guard the use of
+  quadmath.h in the sources so that CMake and the sources always agree.
+---
+ CMakeLists.txt | 13 ++++++++++---
+ 1 file changed, 10 insertions(+), 3 deletions(-)
+
+diff --git a/CMakeLists.txt b/CMakeLists.txt
+index 63cc890..1eeda25 100644
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -66,9 +66,16 @@ configure_file(
+   "${PROJECT_SOURCE_DIR}/src/qcdloop.pc.in"
+   "${PROJECT_SOURCE_DIR}/src/qcdloop.pc"
+   )
+-# Only enable quadmath for non-aarch64 as aarch64 supports float128 and so
+-# doesn't have libquadmath
+-IF(NOT CMAKE_SYSTEM_PROCESSOR MATCHES "aarch64|^arm")
++# Only enable quadmath for the architectures that use it in the sources.
++# Check the compiler target rather than CMAKE_SYSTEM_PROCESSOR, which is taken
++# from the host uname and so is wrong under emulation.
++include(CheckCXXSourceCompiles)
++check_cxx_source_compiles("
++#if !(defined(__x86_64__) || defined(__i386__) || defined(__PPC64__) || defined(__ppc64__) || defined(_ARCH_PPC64))
++#error libquadmath is not used on this architecture
++#endif
++int main() { return 0; }" QCDLOOP_USE_QUADMATH)
++IF(QCDLOOP_USE_QUADMATH)
+ set(QUADMATH_NAMES ${QUADMATH_NAMES} libquadmath.so quadmath)
+ find_library(QUADMATH_LIBRARY
+   NAMES ${QUADMATH_NAMES}
+-- 
+2.55.0
+
